@@ -6,7 +6,7 @@
 using namespace std;
 
 int main(void) {
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 	setlocale(LC_ALL, "RU");
 
 	Greatings();

@@ -1,11 +1,16 @@
 #include "interface.h"
 #include<iostream>
 #include<locale.h>
-//#include"task.h"
 #include"enter.h"
 #include "test.h"
 #include"Array.h"
 #include"file.h"
+#include"ISort.h"
+#include"BubbleSort.h"
+#include"SelectionSort.h"
+#include"InsertionSort.h"
+#include"ShellSort.h"
+#include"QuickSort.h"
 
 #define FROM -100
 #define TO 100
@@ -90,7 +95,7 @@ void MenuTask()
 	setlocale(LC_ALL, "RU");
 
 	int userChoice = 0;
-	int arrSize = 0/*, mediana = 1*/;
+	int arrRow = 0, arrColumn = 0/*, mediana = 1*/;
 	Array arr;
 
 	//флаг выхода из подменю
@@ -117,24 +122,34 @@ void MenuTask()
 		{
 			//ввод данных с клавиатуры
 		case KEYBORD: {
-			cout << "Введите количество элементов массива" << endl;
-			input(arrSize);
-			while (arrSize <= 0) {
+			cout << "Введите количество строк массива" << endl;
+			input(arrRow);
+			while (arrRow <= 0) {
 				cout << "Количество элементов массива не может быть отрицательным или нулевым." << endl
 					<< "Введите корректное значение" << endl;
-				input(arrSize);
+				input(arrRow);
 			}
-			arr = Array(arrSize);
-			cout << "Введите элементы массива (" << arrSize << "):" << endl;
-			for (int i = 0; i < arrSize; ++i) {
-				cout << "[" << i + 1 << "]: ";
-				input(arr[i]);
+			cout << "Введите количество столбцов массива" << endl;
+			input(arrColumn);
+			while (arrColumn <= 0) {
+				cout << "Количество элементов массива не может быть отрицательным или нулевым." << endl
+					<< "Введите корректное значение" << endl;
+				input(arrColumn);
+			}
+			arr = Array(arrRow, arrColumn);
+			cout << "Введите элементы массива [" << arrRow << "][" << arrColumn << "]:" << endl;
+			for (int i = 0; i < arrRow; ++i) {
+				for (int j = 0; j < arrColumn; ++j) {
+					cout << "[" << i + 1 << "][" << j + 1 << "]:";
+					input(arr[i][j]);
+				}
+				
 			}
 			break;
 		}
-					  //ввод из файла
+		//ввод из файла
 		case INP_FILE: {
-			while (arr.GetArrSize() == 0) {
+			while (arr.GetArrRow() == 0) {
 				cout << "Данные для массива:" << endl;
 				InputFromFile(arr);
 			}
@@ -142,16 +157,25 @@ void MenuTask()
 		}
 					   //ввод произвольных чисел
 		case RANDOM: {
-			cout << "Введите количество элементов массива" << endl;
-			input(arrSize);
-			while (arrSize <= 0) {
+			cout << "Введите количество строк массива" << endl;
+			input(arrRow);
+			while (arrRow <= 0) {
 				cout << "Количество элементов массива не может быть отрицательным или нулевым." << endl
 					<< "Введите корректное значение" << endl;
-				input(arrSize);
+				input(arrRow);
 			}
-			arr = Array(arrSize);
-			for (int i = 0; i < arrSize; ++i) {
-				arr[i] = RandomInt(FROM, TO);
+			cout << "Введите количество столбцов массива" << endl;
+			input(arrColumn);
+			while (arrColumn <= 0) {
+				cout << "Количество элементов массива не может быть отрицательным или нулевым." << endl
+					<< "Введите корректное значение" << endl;
+				input(arrColumn);
+			}
+			arr = Array(arrRow, arrColumn);
+			for (int i = 0; i < arrRow; ++i) {
+				for (int j = 0; j < arrColumn; ++j) {
+					arr[i][j] = RandomInt(FROM, TO);
+				}
 			}
 			break;
 		}
@@ -168,27 +192,43 @@ void MenuTask()
 		}
 		//выполняется если были введены данные массива
 		//и не выбран пункт НАЗАД
-		if (flagExitSubMenu && arr.GetArrSize() > 0) {
-			cout << "Массив размера " << arr.GetArrSize() << endl;
-			for (int i = 0; i < arr.GetArrSize(); ++i) {
-				cout << "[" << i + 1 << "]: " << arr[i] << ", ";
-			}
+		if (flagExitSubMenu && arr.GetArrRow() > 0) {
+			arr.PrintArray();
+			Array tempArray;
+			tempArray = arr;
+
+			BubbleSort bSort;
+			bSort.Sort(tempArray);
+			tempArray.PrintArray();
+			tempArray = arr;
+
+			SelectionSort sSort;
+			sSort.Sort(tempArray);
+			tempArray.PrintArray();
+			tempArray = arr;
 			
-			/*
-			ЗАМЕНИТЬ НА СОРТИРОВКИ
-			mediana = Mediana(arr);
-			cout << endl << "Номер элемента медианы массива: " << mediana << endl << endl;
-			for (int i = 0; i < arr.GetArrSize(); ++i) {
-				if (i == mediana - 1) {
-					setColor(Green, White);
-					cout << "[" << i + 1 << "]: " << arr[i] << ", ";
-					setColor(Black, White);
-				}
-				else {
-					cout << "[" << i + 1 << "]: " << arr[i] << ", ";
-				}
-			}
-			*/
+			InsertionSort iSort;
+			iSort.Sort(tempArray);
+			tempArray.PrintArray();
+			tempArray = arr;
+
+			ShellSort shSort;
+			shSort.Sort(tempArray);
+			tempArray.PrintArray();
+			tempArray = arr;
+
+			QuickSort qSort;
+			qSort.Sort(tempArray);
+			tempArray.PrintArray();
+			tempArray = arr;
+
+			shSort.PrintTableLegend();
+			bSort.PrintResult();
+			sSort.PrintResult();
+			iSort.PrintResult();
+			shSort.PrintResult();
+			qSort.PrintResult();
+			
 			cout << endl << "Желаете сохранить исходные данные в файл?" << endl
 				<< "1 - Да" << endl
 				<< "0 - Нет" << endl;
@@ -200,9 +240,9 @@ void MenuTask()
 				<< "1 - Да" << endl
 				<< "0 - Нет" << endl;
 			input(flagSaveToFile);
-			if (flagSaveToFile)
-				//SaveResultToFile(arr, Mediana(arr));
-
+			if (flagSaveToFile) {
+				SaveResultToFile(arr, bSort, sSort, iSort, shSort, qSort);
+			}
 			userChoice = RETURN;
 		}
 		system("pause");

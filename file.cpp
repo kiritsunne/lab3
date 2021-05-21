@@ -48,17 +48,39 @@ string SaveToFile() {
 	return filePath;
 }
 //Сохранение результата в файл
-/*
-ИЗМЕНИТЬ ОХРАНЕНИЕ РЕЗУЛЬТАТА НА ОСНОВАНИИ РЕЗУЛЬТАТОВ СОРТИРОВКИ И ТАБЛИЦЫ
-void SaveResultToFile(Array &arr, int result)
+
+//ИЗМЕНИТЬ ОХРАНЕНИЕ РЕЗУЛЬТАТА НА ОСНОВАНИИ РЕЗУЛЬТАТОВ СОРТИРОВКИ И ТАБЛИЦЫ
+void SaveResultToFile(Array & arr, BubbleSort & bSort, SelectionSort & sSort, InsertionSort & iSort, ShellSort & shSort, QuickSort & qSort)
 {
 	ofstream file(SaveToFile(), ios_base::app);
 	if (file.is_open()) {
-		file << "Массив размера " << arr.GetArrSize() << endl;
-		for (int i = 0; i < arr.GetArrSize(); ++i) {
-			file << arr[i] << " ";
+		file.setf(ios::left);
+		file << "Массив размера [" << arr.GetArrRow() << "][" << arr.GetArrColumn() << "]:" << endl;
+		for (int i = 0; i < arr.GetArrRow(); ++i) {
+			file << "[" << i + 1 << "]: ";
+			for (int j = 0; j < arr.GetArrColumn(); ++j) {
+
+				file << "[" << j + 1 << "]";
+				file.width(5);
+				file << arr[i][j];
+				file << " ";
+			}
+			file << endl;
 		}
-		file << "Медиана массива: " << result << endl << endl;
+
+		file << endl << "Результаты сортировок" << endl;
+		SaveResultSortToFile(arr, bSort, file);
+		SaveResultSortToFile(arr, sSort, file);
+		SaveResultSortToFile(arr, iSort, file);
+		SaveResultSortToFile(arr, shSort, file);
+		SaveResultSortToFile(arr, qSort, file);
+		file << endl << "Таблица результатов сортировки" << endl;
+		bSort.PrintTableLegendToFile(file);
+		bSort.PrintResultToFile(file);
+		sSort.PrintResultToFile(file);
+		iSort.PrintResultToFile(file);
+		shSort.PrintResultToFile(file);
+		qSort.PrintResultToFile(file);
 		cout << "Сохранение завершено" << endl;
 	}
 	else {
@@ -67,7 +89,7 @@ void SaveResultToFile(Array &arr, int result)
 
 	file.close();
 }
-*/
+
 //Сохранение начальных данных в файл
 //если формат сохранения начальных данных будет нарушен
 //программа не распознает их при чтении начальных данных из файла
@@ -76,13 +98,14 @@ void SaveInitialDataToFile(Array & arr)
 	ofstream file(SaveToFile(), ios_base::app);
 	if (file.is_open()) {
 		file << "[INPUT]" << endl
-			<< "Массив размера N= " << arr.GetArrSize() << endl
-			<< "[ ";
-		for (int i = 0; i < arr.GetArrSize(); ++i) {
-			file << arr[i] << " ";
+			<< "Массив размера N[ " << arr.GetArrRow() << " ][ " << arr.GetArrColumn() << " ]" << endl;
+		for (int i = 0; i < arr.GetArrRow(); ++i) {
+			file << "[ ";
+			for (int j = 0; j < arr.GetArrColumn(); ++j) {
+				file << arr[i][j] << " ";
+			}
+			file << " ]" << endl;
 		}
-		file << "]" << endl;
-
 		cout << "Сохранение завершено" << endl;
 	}
 	else {
@@ -94,7 +117,7 @@ void SaveInitialDataToFile(Array & arr)
 //ввод из файла
 void InputFromFile(Array & arrayToReturn)
 {
-	string filePath;
+	string filePath = "";
 	filePath = EnterFilePath();
 
 	while (!CheckExistFile(filePath)) {
@@ -103,7 +126,8 @@ void InputFromFile(Array & arrayToReturn)
 	}
 
 	ifstream file(filePath, ios_base::binary);
-	int arraySize = 0;
+	//int arraySize = 0;
+	int arrayRow = 0, arrayColumn = 0;
 
 	bool
 		//если пользователь соглавсен использовать
@@ -129,28 +153,38 @@ void InputFromFile(Array & arrayToReturn)
 			emptyDataFlag = false;
 
 			cout << "input" << endl;
-			while (bufString != "N=") {
+			while (bufString != "N[") {
 				file >> bufString;
 			}
-			correctFileInputFlag = (fileInput(file, arraySize) && arraySize > 0);
-			if (correctFileInputFlag)
-				arrayToReturn = Array(arraySize);
+			correctFileInputFlag = (fileInput(file, arrayRow) && arrayRow > 0);
+			while (bufString != "][") {
+				file >> bufString;
+			}
+			correctFileInputFlag = (fileInput(file, arrayColumn) && arrayColumn > 0);
 
-			while (bufString != "[") {
-				file >> bufString;
-			}
-			counter = 0;
-			for (int i = 0; i < arraySize; ++i) {
-				correctFileInputFlag &= fileInput(file, bufNum);
-				if (correctFileInputFlag && (arrayToReturn.GetArrayPointer() != 0)) {
-					arrayToReturn[i] = bufNum;
+			if (correctFileInputFlag)
+				arrayToReturn = Array(arrayRow, arrayColumn);
+
+			for (int i = 0; i < arrayRow; ++i) {
+				while (bufString != "[") {
+					file >> bufString;
 				}
+				for (int j = 0; j < arrayColumn; ++j) {
+					correctFileInputFlag &= fileInput(file, bufNum);
+					if (correctFileInputFlag && (arrayToReturn.GetArrayPointer() != 0)) {
+						arrayToReturn[i][j] = bufNum;
+					}
+				}
+				file >> bufString;
 			}
 
 			if (correctFileInputFlag) {
-				cout << "Массив размера " << arraySize << endl;
-				for (int i = 0; i < arraySize; ++i) {
-					cout << arrayToReturn[i] << " ";
+				cout << "Массив размера [" << arrayRow << "][" << arrayColumn << "]:" << endl;
+				for (int i = 0; i < arrayRow; ++i) {
+					for (int j = 0; j < arrayColumn; ++j) {
+						cout << arrayToReturn[i][j] << " ";
+					}
+					cout << endl;
 				}
 
 				cout << "Выбрать данный массив?" << endl
@@ -158,9 +192,13 @@ void InputFromFile(Array & arrayToReturn)
 					<< "0 - Нет" << endl;
 
 				input(agreeFlag);
+				if (!agreeFlag) {
+					arrayToReturn.SetArraySize(0, 0);
+				}
 			}
 			else {
 				agreeFlag = false;
+				arrayToReturn.SetArraySize(0, 0);
 			}
 			correctFileInputFlag = true;
 		}
@@ -171,7 +209,7 @@ void InputFromFile(Array & arrayToReturn)
 	file.close();
 }
 //Проверка существующего файла
-bool CheckExistFile(string &filePath) {
+bool CheckExistFile(string & filePath) {
 	bool correctFileFlag = false;
 	if (fs::exists(fs::status(filePath))) {
 		correctFileFlag = true;
@@ -187,7 +225,7 @@ bool CheckExistFile(string &filePath) {
 	return correctFileFlag;
 }
 //создание файла для сохранение
-bool CreateNewFile(string &filePath) {
+bool CreateNewFile(string & filePath) {
 
 	if (fs::exists(fs::status(filePath))) {
 		cout << "Такой файл уже существует" << endl;

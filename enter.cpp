@@ -1,4 +1,5 @@
 #include <cmath>
+#include "enter.h"
 
 
 int RandomInt(int leftSide, int rightSide)
@@ -13,4 +14,9 @@ int RandomInt(int leftSide, int rightSide)
 		return leftSide + rand() % (abs(leftSide) + rightSide + 1);
 	}
 	else return leftSide + rand() % (rightSide - leftSide);
+}
+
+bool IsOdd(int num)
+{
+	return (num % 2 == 1)||(num % 2 == -1) ? true : false;
 }

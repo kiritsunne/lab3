@@ -1,7 +1,12 @@
 //#include "Array.h"
 #include <cmath>
 #include <iostream>
-//#include "task.h"
+#include"ISort.h"
+#include"BubbleSort.h"
+#include"SelectionSort.h"
+#include"InsertionSort.h"
+#include"ShellSort.h"
+#include"QuickSort.h"
 #define NUMOFTEST 5
 #define NUM 11
 const int arrayData[NUMOFTEST][NUM] = { {5, 4, -1, 0, -90, 1},

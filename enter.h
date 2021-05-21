@@ -3,13 +3,15 @@
 #include<iostream>
 #include<fstream>
 
+
 using namespace std;
 
-template <typename NUM> void input(NUM& arg);
-template <typename NUM> bool fileInput(ifstream &file, NUM &arg);
+template <typename NUM> void input(NUM & arg);
+template <typename NUM> bool fileInput(ifstream & file, NUM & arg);
 int RandomInt(int leftSide, int rightSide);
+bool IsOdd(int num);
 
-template <typename NUM> inline void input(NUM &arg)
+template <typename NUM> inline void input(NUM & arg)
 {
 	NUM _buffer; bool error;
 
@@ -27,7 +29,7 @@ template <typename NUM> inline void input(NUM &arg)
 	arg = _buffer;
 }
 
-template <typename NUM> inline bool fileInput(ifstream &file, NUM &arg)
+template <typename NUM> inline bool fileInput(ifstream & file, NUM & arg)
 {
 	NUM _buffer; bool error;
 
@@ -35,7 +37,7 @@ template <typename NUM> inline bool fileInput(ifstream &file, NUM &arg)
 
 	error = (file.bad() || file.fail());
 	if (error) {
-		cout << "Ошибка чтения массива!" << endl;
+		cout << "Ошибка чтения!" << endl;
 		file.clear();
 		file.ignore();
 		return false;
